@@ -34,6 +34,10 @@ import AdminCalendar from './pages/admin/AdminCalendar';
 import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminReviews from './pages/admin/AdminReviews';
 
+// Route Guards
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/auth/AdminRoute';
+
 // Public layout wrapper
 function PublicLayout() {
   return (
@@ -73,16 +77,28 @@ function App() {
               <Route path="/register" element={<Register />} />
             </Route>
 
-            {/* Account routes */}
-            <Route element={<AccountLayout />}>
+            {/* Account routes (Protected for logged in customers) */}
+            <Route
+              element={
+                <ProtectedRoute>
+                  <AccountLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route path="/account" element={<AccountDashboard />} />
               <Route path="/account/bookings" element={<AccountBookings />} />
               <Route path="/account/bookings/:id" element={<BookingDetail />} />
               <Route path="/account/profile" element={<Profile />} />
             </Route>
 
-            {/* Admin routes */}
-            <Route element={<AdminLayout />}>
+            {/* Admin routes (Protected strictly for role === 'admin') */}
+            <Route
+              element={
+                <AdminRoute>
+                  <AdminLayout />
+                </AdminRoute>
+              }
+            >
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/rooms" element={<AdminRooms />} />
               <Route path="/admin/room-types" element={<AdminRoomTypes />} />

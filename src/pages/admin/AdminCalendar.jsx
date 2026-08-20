@@ -1,16 +1,49 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { ROOMS, ROOM_TYPES, SAMPLE_RESERVATIONS } from '../../lib/mockData';
 import {
-  format, addMonths, subMonths, startOfMonth, endOfMonth,
-  eachDayOfInterval, isToday, differenceInDays, parseISO, isBefore, isAfter,
+  format,
+  addMonths,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isToday,
+  differenceInDays,
+  parseISO,
+  isBefore,
+  isAfter,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { adminService } from '../../services/adminService';
 import { cn } from '../../lib/utils';
+import toast from 'react-hot-toast';
 
 export default function AdminCalendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [calendarData, setCalendarData] = useState({ rooms: [], reservations: [], roomTypes: [] });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCalendar() {
+      try {
+        const data = await adminService.getCalendarData();
+        if (isMounted) setCalendarData(data);
+      } catch (err) {
+        console.error('Error fetching calendar data:', err);
+        toast.error('Error al cargar datos del calendario');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    loadCalendar();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -21,18 +54,18 @@ export default function AdminCalendar() {
   // Group rooms by type
   const roomsByType = useMemo(() => {
     const grouped = {};
-    ROOMS.forEach((room) => {
-      const type = ROOM_TYPES.find((t) => t.id === room.room_type_id);
-      const typeName = type?.name || 'Otro';
+    (calendarData.rooms || []).forEach((room) => {
+      const type = (calendarData.roomTypes || []).find((t) => t.id === room.room_type_id);
+      const typeName = type?.name || 'Habitaciones';
       if (!grouped[typeName]) grouped[typeName] = [];
       grouped[typeName].push(room);
     });
     return grouped;
-  }, []);
+  }, [calendarData.rooms, calendarData.roomTypes]);
 
   // Calculate reservation blocks for a given room
   const getReservationBlocks = (roomId) => {
-    return SAMPLE_RESERVATIONS
+    return (calendarData.reservations || [])
       .filter((r) => r.room_id === roomId && r.status !== 'cancelled')
       .map((res) => {
         const checkIn = parseISO(res.check_in);
@@ -57,89 +90,126 @@ export default function AdminCalendar() {
       .filter((b) => b.visible);
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center" style={{ minHeight: '400px' }}>
+        <div className="spinner spinner-lg" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-xl)' }}>
         <div>
-          <h1 className="heading-3">Calendario</h1>
+          <h1 className="heading-3">Calendario de Ocupación</h1>
           <p style={{ color: 'var(--muted)', fontSize: 'var(--text-sm)' }}>
-            Vista de ocupación del hotel
+            Diagrama Gantt de reservas por habitación en tiempo real
           </p>
         </div>
       </div>
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        <div className="calendar-container">
-          {/* Calendar header with month navigation */}
-          <div className="calendar-header">
-            <button className="btn btn-ghost btn-icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-              <ChevronLeft size={20} />
-            </button>
-            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-xl)', textTransform: 'capitalize' }}>
+        <div className="calendar-gantt">
+          {/* Controls */}
+          <div className="calendar-controls">
+            <div className="calendar-title">
               {format(currentMonth, 'MMMM yyyy', { locale: es })}
-            </h2>
-            <button className="btn btn-ghost btn-icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-              <ChevronRight size={20} />
-            </button>
+            </div>
+            <div className="flex gap-xs">
+              <button
+                className="btn btn-ghost btn-sm btn-icon"
+                onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setCurrentMonth(new Date())}
+              >
+                Hoy
+              </button>
+              <button
+                className="btn btn-ghost btn-sm btn-icon"
+                onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
 
-          {/* Calendar grid */}
-          <div className="calendar-grid" style={{ minWidth: Math.max(800, days.length * 45) }}>
-            {/* Day headers */}
-            <div className="calendar-row">
-              <div className="calendar-room-label" style={{ fontWeight: 600, fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>
-                HABITACIÓN
-              </div>
-              <div className="calendar-cells" style={{ display: 'flex' }}>
+          {/* Timeline Grid */}
+          <div className="calendar-grid">
+            {/* Days header */}
+            <div className="calendar-row header-row">
+              <div className="calendar-room-col">Habitación</div>
+              <div className="calendar-days-col">
                 {days.map((day) => (
                   <div
                     key={day.toISOString()}
                     className={cn('calendar-day-header', isToday(day) && 'today')}
-                    style={{ flex: 1, minWidth: 40 }}
+                    style={{ width: cellWidth }}
                   >
-                    <div style={{ fontWeight: 600 }}>{format(day, 'd')}</div>
-                    <div style={{ fontSize: '0.6rem', textTransform: 'uppercase' }}>{format(day, 'EEE', { locale: es })}</div>
+                    <span className="day-name">{format(day, 'EEE', { locale: es })}</span>
+                    <span className="day-number">{format(day, 'd')}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Room rows grouped by type */}
-            {Object.entries(roomsByType).map(([typeName, rooms]) => (
+            {Object.entries(roomsByType).map(([typeName, typeRooms]) => (
               <div key={typeName}>
-                {/* Type header */}
-                <div className="calendar-row" style={{ background: 'var(--ivory-dark)' }}>
-                  <div className="calendar-room-label" style={{
-                    fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase',
-                    letterSpacing: '0.1em', color: 'var(--gold)', background: 'var(--ivory-dark)',
-                  }}>
-                    {typeName}
-                  </div>
-                  <div className="calendar-cells" style={{ background: 'var(--ivory-dark)' }} />
+                {/* Type header separator */}
+                <div
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: 'var(--ivory-dark)',
+                    borderBottom: '1px solid var(--warm-gray)',
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: 600,
+                    color: 'var(--muted-dark)',
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {typeName} ({typeRooms.length} habitaciones)
                 </div>
 
-                {/* Room rows */}
-                {rooms.map((room) => {
+                {typeRooms.map((room) => {
                   const blocks = getReservationBlocks(room.id);
                   return (
                     <div key={room.id} className="calendar-row">
-                      <div className="calendar-room-label">
-                        <div>
-                          <div style={{ fontWeight: 600 }}>Hab {room.room_number}</div>
-                          {room.status === 'maintenance' && (
-                            <span className="badge badge-maintenance" style={{ fontSize: '0.6rem', padding: '0 0.25rem' }}>
-                              Mant.
-                            </span>
-                          )}
+                      <div className="calendar-room-col">
+                        <div className="flex items-center gap-xs">
+                          <span style={{ fontWeight: 600 }}>Hab {room.room_number}</span>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              padding: '1px 4px',
+                              borderRadius: '4px',
+                              background:
+                                room.status === 'available'
+                                  ? 'var(--success-light)'
+                                  : 'var(--warning-light)',
+                              color:
+                                room.status === 'available'
+                                  ? 'var(--success)'
+                                  : 'var(--warning)',
+                            }}
+                          >
+                            Piso {room.floor}
+                          </span>
                         </div>
                       </div>
-                      <div className="calendar-cells" style={{ display: 'flex', position: 'relative' }}>
-                        {/* Grid cells */}
+
+                      <div className="calendar-days-col">
+                        {/* Day grid lines */}
                         {days.map((day) => (
                           <div
                             key={day.toISOString()}
-                            className="calendar-cell"
-                            style={{ flex: 1, minWidth: 40 }}
+                            className={cn('calendar-day-cell', isToday(day) && 'today')}
+                            style={{ width: cellWidth }}
                           />
                         ))}
 
@@ -148,20 +218,17 @@ export default function AdminCalendar() {
                           <div
                             key={block.id}
                             className={cn('calendar-block', block.status)}
-                            style={{ left: block.left, width: block.width }}
-                            title={`${block.reservation_code} - ${block.guest.full_name}`}
+                            style={{
+                              left: block.left,
+                              width: block.width,
+                            }}
+                            title={`${block.reservation_code} - ${block.guest?.full_name} (${block.check_in} a ${block.check_out})`}
                           >
-                            {block.guest.full_name.split(' ')[0]}
+                            <span className="block-text">
+                              {block.reservation_code} · {block.guest?.full_name}
+                            </span>
                           </div>
                         ))}
-
-                        {/* Maintenance overlay */}
-                        {room.status === 'maintenance' && (
-                          <div style={{
-                            position: 'absolute', inset: 0,
-                            background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 20px)',
-                          }} />
-                        )}
                       </div>
                     </div>
                   );
@@ -169,24 +236,55 @@ export default function AdminCalendar() {
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Legend */}
-        <div className="flex gap-lg flex-wrap" style={{ marginTop: 'var(--space-lg)' }}>
-          {[
-            { label: 'Confirmada', className: 'confirmed' },
-            { label: 'Check-in', className: 'checked-in' },
-            { label: 'Check-out', className: 'checked-out' },
-            { label: 'Pendiente', className: 'pending' },
-            { label: 'Mantenimiento', className: 'maintenance' },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center gap-xs" style={{ fontSize: 'var(--text-sm)' }}>
-              <div style={{
-                width: 16, height: 16, borderRadius: 'var(--radius-sm)',
-              }} className={cn('calendar-block', item.className)} />
-              <span style={{ color: 'var(--muted-dark)' }}>{item.label}</span>
-            </div>
-          ))}
+          {/* Legend */}
+          <div
+            style={{
+              padding: '1rem',
+              borderTop: '1px solid var(--warm-gray)',
+              display: 'flex',
+              gap: '1.5rem',
+              fontSize: 'var(--text-xs)',
+              color: 'var(--muted)',
+            }}
+          >
+            <span className="flex items-center gap-xs">
+              <span
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: 3,
+                  background: 'var(--info)',
+                  display: 'inline-block',
+                }}
+              />
+              Confirmada
+            </span>
+            <span className="flex items-center gap-xs">
+              <span
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: 3,
+                  background: 'var(--success)',
+                  display: 'inline-block',
+                }}
+              />
+              Checked In
+            </span>
+            <span className="flex items-center gap-xs">
+              <span
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: 3,
+                  background: 'var(--muted)',
+                  display: 'inline-block',
+                }}
+              />
+              Checked Out
+            </span>
+          </div>
         </div>
       </motion.div>
     </div>

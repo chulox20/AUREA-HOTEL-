@@ -17,24 +17,18 @@ export function AuthProvider({ children }) {
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile from Supabase:', error.message);
+        setProfile(null);
+        return null;
+      }
+
       setProfile(data);
       return data;
     } catch (err) {
-      console.error('Error fetching profile:', err);
-      // In dev mode without Supabase, use a mock profile
-      const mockProfile = {
-        id: userId,
-        full_name: 'Jesús Figueroa',
-        email: 'jesus@example.com',
-        phone: '+52 555 123 4567',
-        country: 'México',
-        avatar_url: null,
-        role: 'admin', // Default to admin for development
-        created_at: new Date().toISOString(),
-      };
-      setProfile(mockProfile);
-      return mockProfile;
+      console.error('Unexpected error fetching profile:', err);
+      setProfile(null);
+      return null;
     }
   }, []);
 
@@ -42,13 +36,19 @@ export function AuthProvider({ children }) {
     // Get initial session
     const getSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
         if (session?.user) {
           setUser(session.user);
           await fetchProfile(session.user.id);
+        } else {
+          setUser(null);
+          setProfile(null);
         }
       } catch (err) {
-        console.error('Session error:', err);
+        console.error('Session retrieval error:', err);
       } finally {
         setLoading(false);
       }
@@ -57,18 +57,18 @@ export function AuthProvider({ children }) {
     getSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id);
-        } else {
-          setUser(null);
-          setProfile(null);
-        }
-        setLoading(false);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        await fetchProfile(session.user.id);
+      } else {
+        setUser(null);
+        setProfile(null);
       }
-    );
+      setLoading(false);
+    });
 
     return () => subscription.unsubscribe();
   }, [fetchProfile]);
@@ -93,6 +93,10 @@ export function AuthProvider({ children }) {
       password,
     });
     if (error) throw error;
+    if (data?.user) {
+      setUser(data.user);
+      await fetchProfile(data.user.id);
+    }
     return data;
   };
 
@@ -125,29 +129,10 @@ export function AuthProvider({ children }) {
       .eq('id', user.id)
       .select()
       .single();
+
     if (error) throw error;
     setProfile(data);
     return data;
-  };
-
-  // Dev mode login (when Supabase is not configured)
-  const devLogin = (role = 'customer') => {
-    const mockUser = {
-      id: 'dev-user-id',
-      email: role === 'admin' ? 'admin@aureahotel.com' : 'guest@aureahotel.com',
-    };
-    const mockProfile = {
-      id: 'dev-user-id',
-      full_name: role === 'admin' ? 'Admin Aurea' : 'Jesús Figueroa',
-      email: mockUser.email,
-      phone: '+52 555 123 4567',
-      country: 'México',
-      avatar_url: null,
-      role,
-      created_at: new Date().toISOString(),
-    };
-    setUser(mockUser);
-    setProfile(mockProfile);
   };
 
   const isAdmin = profile?.role === 'admin';
@@ -165,14 +150,9 @@ export function AuthProvider({ children }) {
     signOut,
     updateProfile,
     fetchProfile,
-    devLogin,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

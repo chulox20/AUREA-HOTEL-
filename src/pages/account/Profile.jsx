@@ -15,6 +15,17 @@ export default function Profile() {
   });
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        full_name: profile.full_name || '',
+        email: profile.email || '',
+        phone: profile.phone || '',
+        country: profile.country || '',
+      });
+    }
+  }, [profile]);
+
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);

@@ -12,7 +12,7 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, profile, isAdmin, signOut, devLogin } = useAuth();
+  const { isAuthenticated, profile, isAdmin, signOut } = useAuth();
 
   const isHome = location.pathname === '/';
 
@@ -177,11 +177,9 @@ export default function Header() {
               </div>
             ) : (
               <>
-                {/* Dev login buttons — remove in production */}
                 <button
                   className="btn btn-ghost btn-sm hide-mobile"
-                  onClick={() => devLogin('customer')}
-                  title="Dev: Login as Customer"
+                  onClick={() => navigate('/login')}
                 >
                   Iniciar sesión
                 </button>

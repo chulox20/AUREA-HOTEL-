@@ -1,16 +1,20 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Star, Users, BedDouble, Maximize, ArrowRight,
-  SlidersHorizontal, X,
+  Star,
+  Users,
+  BedDouble,
+  Maximize,
+  ArrowRight,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { useBooking } from '../../contexts/BookingContext';
-import { ROOM_TYPES, AMENITY_ICONS } from '../../lib/mockData';
+import { roomService } from '../../services/roomService';
 import { formatCurrency, cn } from '../../lib/utils';
 
 const ROOM_TYPE_FILTERS = ['Todas', 'Standard', 'Deluxe', 'Suite', 'Presidential'];
-const AMENITY_FILTERS = ['Wi-Fi', 'Piscina', 'Balcón', 'Vista al mar', 'Jacuzzi', 'Minibar'];
+const AMENITY_FILTERS = ['Wi-Fi', 'TV', 'Minibar', 'Aire acondicionado', 'Baño privado', 'Balcón', 'Vista al mar', 'Jacuzzi'];
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -20,38 +24,66 @@ const fadeInUp = {
 export default function Rooms() {
   const navigate = useNavigate();
   const { checkIn, checkOut, adults, setSearchParams } = useBooking();
+
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [typeFilter, setTypeFilter] = useState('Todas');
   const [priceRange, setPriceRange] = useState(500);
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadRooms() {
+      try {
+        const data = await roomService.getRoomTypes();
+        if (isMounted) {
+          setRooms(data);
+          // Set maximum price range from data
+          const maxPrice = Math.max(...data.map((r) => Number(r.base_price) || 500), 500);
+          setPriceRange(maxPrice);
+        }
+      } catch (err) {
+        console.error('Error loading rooms:', err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    loadRooms();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const toggleAmenity = (amenity) => {
     setSelectedAmenities((prev) =>
-      prev.includes(amenity)
-        ? prev.filter((a) => a !== amenity)
-        : [...prev, amenity]
+      prev.includes(amenity) ? prev.filter((a) => a !== amenity) : [...prev, amenity]
     );
   };
 
   const filteredRooms = useMemo(() => {
-    return ROOM_TYPES.filter((room) => {
+    return rooms.filter((room) => {
       // Type filter
       if (typeFilter !== 'Todas') {
         const typeLower = typeFilter.toLowerCase();
         if (!room.name.toLowerCase().includes(typeLower)) return false;
       }
       // Price filter
-      if (room.base_price > priceRange) return false;
+      if (Number(room.base_price) > priceRange) return false;
       // Amenity filter
       if (selectedAmenities.length > 0) {
-        const hasAll = selectedAmenities.every((a) => room.amenities.includes(a));
+        const roomAmenities = room.amenities || [];
+        const hasAll = selectedAmenities.every((a) => roomAmenities.includes(a));
         if (!hasAll) return false;
       }
       // Capacity filter
       if (room.capacity < adults) return false;
       return true;
     });
-  }, [typeFilter, priceRange, selectedAmenities, adults]);
+  }, [rooms, typeFilter, priceRange, selectedAmenities, adults]);
 
   const clearFilters = () => {
     setTypeFilter('Todas');
@@ -66,7 +98,9 @@ export default function Rooms() {
       <div className="container section-sm">
         {/* Page Header */}
         <div style={{ marginBottom: 'var(--space-xl)' }}>
-          <div className="text-overline" style={{ marginBottom: 'var(--space-xs)' }}>Nuestras habitaciones</div>
+          <div className="text-overline" style={{ marginBottom: 'var(--space-xs)' }}>
+            Nuestras habitaciones
+          </div>
           <h1 className="heading-2">Encuentra tu habitación ideal</h1>
         </div>
 
@@ -90,9 +124,15 @@ export default function Rooms() {
           <aside className={cn('rooms-filters', showFilters ? '' : 'hide-mobile')}>
             <div className="rooms-filters-card">
               <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-md)' }}>
-                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 600 }}>Filtros</h3>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 600 }}>
+                  Filtros
+                </h3>
                 {hasActiveFilters && (
-                  <button className="btn btn-ghost btn-sm" onClick={clearFilters} style={{ textTransform: 'none', fontSize: 'var(--text-xs)' }}>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={clearFilters}
+                    style={{ textTransform: 'none', fontSize: 'var(--text-xs)' }}
+                  >
                     Limpiar
                   </button>
                 )}
@@ -102,7 +142,9 @@ export default function Rooms() {
               <div className="filter-section">
                 <h3>Fechas</h3>
                 <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-                  <label className="form-label" style={{ fontSize: 'var(--text-xs)' }}>Check-in</label>
+                  <label className="form-label" style={{ fontSize: 'var(--text-xs)' }}>
+                    Check-in
+                  </label>
                   <input
                     type="date"
                     className="form-input"
@@ -112,7 +154,9 @@ export default function Rooms() {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label" style={{ fontSize: 'var(--text-xs)' }}>Check-out</label>
+                  <label className="form-label" style={{ fontSize: 'var(--text-xs)' }}>
+                    Check-out
+                  </label>
                   <input
                     type="date"
                     className="form-input"
@@ -165,7 +209,7 @@ export default function Rooms() {
                   <input
                     type="range"
                     min={100}
-                    max={500}
+                    max={600}
                     step={10}
                     value={priceRange}
                     onChange={(e) => setPriceRange(Number(e.target.value))}
@@ -202,11 +246,16 @@ export default function Rooms() {
           <div className="rooms-grid">
             <div className="rooms-header">
               <span className="rooms-count">
-                {filteredRooms.length} habitación{filteredRooms.length !== 1 ? 'es' : ''} encontrada{filteredRooms.length !== 1 ? 's' : ''}
+                {filteredRooms.length} habitación{filteredRooms.length !== 1 ? 'es' : ''} encontrada
+                {filteredRooms.length !== 1 ? 's' : ''}
               </span>
             </div>
 
-            {filteredRooms.length === 0 ? (
+            {loading ? (
+              <div className="flex items-center justify-center" style={{ minHeight: '300px' }}>
+                <div className="spinner spinner-lg" />
+              </div>
+            ) : filteredRooms.length === 0 ? (
               <div className="empty-state">
                 <BedDouble size={48} className="empty-state-icon" />
                 <h3>No se encontraron habitaciones</h3>
@@ -224,14 +273,31 @@ export default function Rooms() {
               >
                 {filteredRooms.map((room) => (
                   <motion.div key={room.id} variants={fadeInUp}>
-                    <div className="room-card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/rooms/${room.slug}`)}>
+                    <div
+                      className="room-card"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => navigate(`/rooms/${room.slug}`)}
+                    >
                       <div className="room-card-image">
-                        <div style={{
-                          width: '100%', height: '100%',
-                          background: `linear-gradient(135deg, ${room.id === 'rt-standard' ? '#2c3e50, #3498db' : room.id === 'rt-deluxe' ? '#2c3e50, #8e44ad' : room.id === 'rt-suite' ? '#0f3460, #16213e' : '#1a1a2e, #b89b5e'})`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: 'rgba(255,255,255,0.2)',
-                        }}>
+                        <div
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            background: `linear-gradient(135deg, ${
+                              room.slug.includes('standard')
+                                ? '#2c3e50, #3498db'
+                                : room.slug.includes('deluxe')
+                                ? '#2c3e50, #8e44ad'
+                                : room.slug.includes('ocean')
+                                ? '#0f3460, #16213e'
+                                : '#1a1a2e, #b89b5e'
+                            })`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'rgba(255,255,255,0.2)',
+                          }}
+                        >
                           <BedDouble size={48} />
                         </div>
                       </div>
@@ -241,11 +307,16 @@ export default function Rooms() {
                         <div className="flex items-center gap-xs" style={{ marginBottom: '0.5rem' }}>
                           <div className="star-rating">
                             {Array.from({ length: 5 }).map((_, i) => (
-                              <Star key={i} size={14} className={`star ${i < Math.floor(room.rating) ? 'filled' : ''}`} fill={i < Math.floor(room.rating) ? 'var(--gold)' : 'none'} />
+                              <Star
+                                key={i}
+                                size={14}
+                                className={`star ${i < 5 ? 'filled' : ''}`}
+                                fill="var(--gold)"
+                              />
                             ))}
                           </div>
                           <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>
-                            {room.rating} ({room.review_count})
+                            5.0 (Excelente)
                           </span>
                         </div>
                         <div className="room-card-price">

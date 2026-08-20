@@ -193,15 +193,14 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
   FOR EACH ROW
   EXECUTE FUNCTION handle_new_user();
 
--- Trigger to generate a readable reservation code (e.g., AUR-1042) on insert
+-- Sequence for atomic, concurrent-safe reservation codes
+CREATE SEQUENCE IF NOT EXISTS reservation_code_seq START 1000;
+
+-- Trigger to generate a readable reservation code (e.g., AUR-1000) on insert
 CREATE OR REPLACE FUNCTION generate_reservation_code()
 RETURNS TRIGGER AS $$
-DECLARE
-  seq INTEGER;
 BEGIN
-  SELECT COALESCE(MAX(CAST(SUBSTRING(reservation_code FROM 5) AS INTEGER)), 999) + 1
-  INTO seq FROM reservations;
-  NEW.reservation_code := 'AUR-' || LPAD(seq::TEXT, 4, '0');
+  NEW.reservation_code := 'AUR-' || LPAD(nextval('reservation_code_seq')::TEXT, 4, '0');
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
