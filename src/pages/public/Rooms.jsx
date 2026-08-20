@@ -1,0 +1,281 @@
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  Star, Users, BedDouble, Maximize, ArrowRight,
+  SlidersHorizontal, X,
+} from 'lucide-react';
+import { useBooking } from '../../contexts/BookingContext';
+import { ROOM_TYPES, AMENITY_ICONS } from '../../lib/mockData';
+import { formatCurrency, cn } from '../../lib/utils';
+
+const ROOM_TYPE_FILTERS = ['Todas', 'Standard', 'Deluxe', 'Suite', 'Presidential'];
+const AMENITY_FILTERS = ['Wi-Fi', 'Piscina', 'Balcón', 'Vista al mar', 'Jacuzzi', 'Minibar'];
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
+
+export default function Rooms() {
+  const navigate = useNavigate();
+  const { checkIn, checkOut, adults, setSearchParams } = useBooking();
+  const [typeFilter, setTypeFilter] = useState('Todas');
+  const [priceRange, setPriceRange] = useState(500);
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const toggleAmenity = (amenity) => {
+    setSelectedAmenities((prev) =>
+      prev.includes(amenity)
+        ? prev.filter((a) => a !== amenity)
+        : [...prev, amenity]
+    );
+  };
+
+  const filteredRooms = useMemo(() => {
+    return ROOM_TYPES.filter((room) => {
+      // Type filter
+      if (typeFilter !== 'Todas') {
+        const typeLower = typeFilter.toLowerCase();
+        if (!room.name.toLowerCase().includes(typeLower)) return false;
+      }
+      // Price filter
+      if (room.base_price > priceRange) return false;
+      // Amenity filter
+      if (selectedAmenities.length > 0) {
+        const hasAll = selectedAmenities.every((a) => room.amenities.includes(a));
+        if (!hasAll) return false;
+      }
+      // Capacity filter
+      if (room.capacity < adults) return false;
+      return true;
+    });
+  }, [typeFilter, priceRange, selectedAmenities, adults]);
+
+  const clearFilters = () => {
+    setTypeFilter('Todas');
+    setPriceRange(500);
+    setSelectedAmenities([]);
+  };
+
+  const hasActiveFilters = typeFilter !== 'Todas' || priceRange < 500 || selectedAmenities.length > 0;
+
+  return (
+    <div className="page">
+      <div className="container section-sm">
+        {/* Page Header */}
+        <div style={{ marginBottom: 'var(--space-xl)' }}>
+          <div className="text-overline" style={{ marginBottom: 'var(--space-xs)' }}>Nuestras habitaciones</div>
+          <h1 className="heading-2">Encuentra tu habitación ideal</h1>
+        </div>
+
+        {/* Mobile filter toggle */}
+        <button
+          className="btn btn-secondary hide-desktop"
+          style={{ marginBottom: 'var(--space-md)', width: '100%' }}
+          onClick={() => setShowFilters(!showFilters)}
+        >
+          <SlidersHorizontal size={16} />
+          Filtros
+          {hasActiveFilters && (
+            <span className="badge badge-gold" style={{ marginLeft: '0.5rem' }}>
+              {selectedAmenities.length + (typeFilter !== 'Todas' ? 1 : 0)}
+            </span>
+          )}
+        </button>
+
+        <div className="rooms-page">
+          {/* ── Filters Sidebar ── */}
+          <aside className={cn('rooms-filters', showFilters ? '' : 'hide-mobile')}>
+            <div className="rooms-filters-card">
+              <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-md)' }}>
+                <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--text-base)', fontWeight: 600 }}>Filtros</h3>
+                {hasActiveFilters && (
+                  <button className="btn btn-ghost btn-sm" onClick={clearFilters} style={{ textTransform: 'none', fontSize: 'var(--text-xs)' }}>
+                    Limpiar
+                  </button>
+                )}
+              </div>
+
+              {/* Dates */}
+              <div className="filter-section">
+                <h3>Fechas</h3>
+                <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                  <label className="form-label" style={{ fontSize: 'var(--text-xs)' }}>Check-in</label>
+                  <input
+                    type="date"
+                    className="form-input"
+                    value={checkIn}
+                    onChange={(e) => setSearchParams({ checkIn: e.target.value })}
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" style={{ fontSize: 'var(--text-xs)' }}>Check-out</label>
+                  <input
+                    type="date"
+                    className="form-input"
+                    value={checkOut}
+                    onChange={(e) => setSearchParams({ checkOut: e.target.value })}
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  />
+                </div>
+              </div>
+
+              {/* Guests */}
+              <div className="filter-section">
+                <h3>Huéspedes</h3>
+                <select
+                  className="form-input form-select"
+                  value={adults}
+                  onChange={(e) => setSearchParams({ adults: Number(e.target.value) })}
+                  style={{ fontSize: 'var(--text-sm)' }}
+                >
+                  <option value={1}>1 adulto</option>
+                  <option value={2}>2 adultos</option>
+                  <option value={3}>3 adultos</option>
+                  <option value={4}>4 adultos</option>
+                </select>
+              </div>
+
+              {/* Room Type */}
+              <div className="filter-section">
+                <h3>Tipo</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  {ROOM_TYPE_FILTERS.map((type) => (
+                    <label key={type} className="filter-checkbox">
+                      <input
+                        type="radio"
+                        name="roomType"
+                        checked={typeFilter === type}
+                        onChange={() => setTypeFilter(type)}
+                        style={{ accentColor: 'var(--gold)' }}
+                      />
+                      {type}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div className="filter-section">
+                <h3>Precio por noche</h3>
+                <div className="price-range">
+                  <input
+                    type="range"
+                    min={100}
+                    max={500}
+                    step={10}
+                    value={priceRange}
+                    onChange={(e) => setPriceRange(Number(e.target.value))}
+                  />
+                  <div className="price-range-labels">
+                    <span>$100</span>
+                    <span style={{ fontWeight: 600, color: 'var(--obsidian)' }}>
+                      Hasta {formatCurrency(priceRange)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Amenities */}
+              <div className="filter-section">
+                <h3>Características</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  {AMENITY_FILTERS.map((amenity) => (
+                    <label key={amenity} className="filter-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={selectedAmenities.includes(amenity)}
+                        onChange={() => toggleAmenity(amenity)}
+                      />
+                      {amenity}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* ── Room Grid ── */}
+          <div className="rooms-grid">
+            <div className="rooms-header">
+              <span className="rooms-count">
+                {filteredRooms.length} habitación{filteredRooms.length !== 1 ? 'es' : ''} encontrada{filteredRooms.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+
+            {filteredRooms.length === 0 ? (
+              <div className="empty-state">
+                <BedDouble size={48} className="empty-state-icon" />
+                <h3>No se encontraron habitaciones</h3>
+                <p>Intenta ajustar los filtros para encontrar habitaciones disponibles.</p>
+                <button className="btn btn-primary" onClick={clearFilters}>
+                  Limpiar filtros
+                </button>
+              </div>
+            ) : (
+              <motion.div
+                className="grid grid-2 gap-lg"
+                initial="hidden"
+                animate="visible"
+                variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+              >
+                {filteredRooms.map((room) => (
+                  <motion.div key={room.id} variants={fadeInUp}>
+                    <div className="room-card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/rooms/${room.slug}`)}>
+                      <div className="room-card-image">
+                        <div style={{
+                          width: '100%', height: '100%',
+                          background: `linear-gradient(135deg, ${room.id === 'rt-standard' ? '#2c3e50, #3498db' : room.id === 'rt-deluxe' ? '#2c3e50, #8e44ad' : room.id === 'rt-suite' ? '#0f3460, #16213e' : '#1a1a2e, #b89b5e'})`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: 'rgba(255,255,255,0.2)',
+                        }}>
+                          <BedDouble size={48} />
+                        </div>
+                      </div>
+                      <div className="room-card-body">
+                        <div className="room-card-type">{room.name.split(' ')[0]}</div>
+                        <h3 className="room-card-name">{room.name}</h3>
+                        <div className="flex items-center gap-xs" style={{ marginBottom: '0.5rem' }}>
+                          <div className="star-rating">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star key={i} size={14} className={`star ${i < Math.floor(room.rating) ? 'filled' : ''}`} fill={i < Math.floor(room.rating) ? 'var(--gold)' : 'none'} />
+                            ))}
+                          </div>
+                          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>
+                            {room.rating} ({room.review_count})
+                          </span>
+                        </div>
+                        <div className="room-card-price">
+                          {formatCurrency(room.base_price)} <span>/ noche</span>
+                        </div>
+                        <div className="room-card-meta">
+                          <div className="room-card-meta-item">
+                            <Users size={16} /> {room.capacity}
+                          </div>
+                          <div className="room-card-meta-item">
+                            <BedDouble size={16} /> {room.beds}
+                          </div>
+                          <div className="room-card-meta-item">
+                            <Maximize size={16} /> {room.size} m²
+                          </div>
+                        </div>
+                      </div>
+                      <div className="room-card-footer">
+                        <button className="btn btn-outline-gold" style={{ width: '100%' }}>
+                          Ver habitación <ArrowRight size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
