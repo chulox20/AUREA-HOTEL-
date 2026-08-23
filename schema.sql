@@ -344,6 +344,14 @@ CREATE POLICY "Users can view payments for their own reservations" ON payments
     )
   );
 
+CREATE POLICY "Users can insert payments for their own reservations" ON payments
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM reservations
+      WHERE reservations.id = reservation_id AND reservations.user_id = auth.uid()
+    )
+  );
+
 CREATE POLICY "Admins can manage all payments" ON payments
   FOR ALL USING (is_admin());
 
