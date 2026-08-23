@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail } from 'lucide-react';
+import Logo from '../common/Logo';
 
 export default function Footer() {
   return (
@@ -7,9 +8,9 @@ export default function Footer() {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <Link to="/" className="header-logo">
-              Aurea Hotel
-            </Link>
+            <div style={{ marginBottom: '1.25rem' }}>
+              <Logo variant="light" size="lg" />
+            </div>
             <p>
               Una estancia diseñada para recordar. Donde el lujo se encuentra con la
               tranquilidad para crear momentos inolvidables.

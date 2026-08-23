@@ -34,6 +34,8 @@ const navItems = [
   ]},
 ];
 
+import Logo from '../common/Logo';
+
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { profile, signOut } = useAuth();
@@ -49,8 +51,10 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className={cn('admin-sidebar', sidebarOpen && 'open')}>
         <div className="admin-sidebar-header">
-          <div className="header-logo" style={{ fontSize: 'var(--text-lg)' }}>Aurea</div>
-          <span>Panel de administración</span>
+          <Logo variant="light" size="sm" to="/admin" />
+          <span style={{ fontSize: '11px', color: 'var(--gold)', letterSpacing: '0.05em', textTransform: 'uppercase', marginTop: '4px' }}>
+            Panel de Administración
+          </span>
         </div>
 
         <nav className="admin-sidebar-nav">

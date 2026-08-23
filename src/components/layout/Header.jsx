@@ -5,6 +5,8 @@ import { Menu, X, User, LogOut, Calendar, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getInitials, cn } from '../../lib/utils';
 
+import Logo from '../common/Logo';
+
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -62,9 +64,7 @@ export default function Header() {
     <>
       <header className={headerClass}>
         <div className="header-inner">
-          <Link to="/" className="header-logo">
-            Aurea Hotel
-          </Link>
+          <Logo variant={isHome && !isScrolled ? 'light' : 'default'} size="md" />
 
           <nav className={cn('header-nav', menuOpen && 'open')}>
             <button

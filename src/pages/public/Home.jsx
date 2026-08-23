@@ -134,58 +134,76 @@ export default function Home() {
       {/* ══ HERO ══ */}
       <section className="hero">
         <div className="hero-bg">
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #1a1a2e 100%)',
-            }}
+          <img
+            src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=2000&q=85"
+            alt="Aurea Hotel & Resort frente al mar"
+            className="hero-img"
           />
         </div>
         <div className="hero-overlay" />
 
         <motion.div className="hero-content" initial="hidden" animate="visible" variants={stagger}>
-          <motion.div className="hero-overline" variants={fadeInUp}>
-            Bienvenido a Aurea Hotel
+          {/* 5-Star Luxury Pill Badge */}
+          <motion.div variants={fadeInUp} className="hero-badge">
+            <span className="flex items-center gap-xs">
+              <Sparkles size={14} style={{ color: 'var(--gold)' }} />
+              <span>DESTINO BOUTIQUE 5 ESTRELLAS</span>
+              <span style={{ opacity: 0.4 }}>·</span>
+              <span>COSTA ESMERALDA</span>
+            </span>
           </motion.div>
-          <motion.h1 variants={fadeInUp}>Una estancia diseñada para recordar</motion.h1>
+
+          <motion.h1 variants={fadeInUp} className="hero-title">
+            Una estancia diseñada para el <span className="text-gold-gradient">deleite absoluto</span>
+          </motion.h1>
+
           <motion.p className="hero-subtitle" variants={fadeInUp}>
-            Donde cada detalle ha sido cuidadosamente pensado para crear momentos extraordinarios frente al mar.
+            Donde la arquitectura de vanguardia y la serenidad del mar convergen para crear experiencias inolvidables.
           </motion.p>
+
           <motion.div className="hero-actions" variants={fadeInUp}>
             <button className="btn btn-primary btn-lg" onClick={() => navigate('/rooms')}>
-              Explorar habitaciones
+              <BedDouble size={18} /> Explorar Habitaciones
             </button>
             <button
-              className="btn btn-outline-gold btn-lg"
-              style={{ borderColor: 'rgba(250,249,246,0.4)', color: 'var(--ivory)' }}
+              className="btn btn-outline-gold btn-lg hero-btn-secondary"
               onClick={() => navigate('/rooms')}
             >
-              Reservar ahora
+              Reservar Estancia <ArrowRight size={16} />
             </button>
+          </motion.div>
+
+          {/* Quick Features Chips Bar */}
+          <motion.div variants={fadeInUp} className="hero-features-bar">
+            <div className="hero-chip">
+              <Waves size={14} /> Vista Panorámica al Mar
+            </div>
+            <div className="hero-chip">
+              <UtensilsCrossed size={14} /> Gastronomía de Autor
+            </div>
+            <div className="hero-chip">
+              <Sparkles size={14} /> Spa & Circuito Termal
+            </div>
+            <div className="hero-chip">
+              <Clock size={14} /> Concierge 24/7
+            </div>
           </motion.div>
         </motion.div>
 
-        {/* Scroll indicator */}
+        {/* Animated Mouse Scroll Indicator */}
         <motion.div
-          style={{
-            position: 'absolute',
-            bottom: '2rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '0.5rem',
-            color: 'rgba(250,249,246,0.5)',
-            fontSize: 'var(--text-xs)',
-            letterSpacing: '0.1em',
-          }}
+          className="hero-scroll-indicator"
           animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
+          transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+          onClick={() => {
+            const searchEl = document.querySelector('.search-bar-floating');
+            if (searchEl) searchEl.scrollIntoView({ behavior: 'smooth' });
+          }}
         >
+          <div className="mouse-icon">
+            <div className="mouse-wheel" />
+          </div>
           <span>DESCUBRIR</span>
-          <ChevronRight size={16} style={{ transform: 'rotate(90deg)' }} />
         </motion.div>
       </section>
 
