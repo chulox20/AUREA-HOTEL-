@@ -135,8 +135,8 @@ export default function Home() {
       <section className="hero">
         <div className="hero-bg">
           <img
-            src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=2000&q=85"
-            alt="Aurea Hotel & Resort frente al mar"
+            src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=2880&q=95"
+            alt="Aurea Hotel & Resort de Lujo 5 Estrellas"
             className="hero-img"
           />
         </div>
@@ -188,22 +188,6 @@ export default function Home() {
               <Clock size={14} /> Concierge 24/7
             </div>
           </motion.div>
-        </motion.div>
-
-        {/* Animated Mouse Scroll Indicator */}
-        <motion.div
-          className="hero-scroll-indicator"
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
-          onClick={() => {
-            const searchEl = document.querySelector('.search-bar-floating');
-            if (searchEl) searchEl.scrollIntoView({ behavior: 'smooth' });
-          }}
-        >
-          <div className="mouse-icon">
-            <div className="mouse-wheel" />
-          </div>
-          <span>DESCUBRIR</span>
         </motion.div>
       </section>
 
