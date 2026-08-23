@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { LogIn, Shield, Key, Sparkles, UserCheck } from 'lucide-react';
+import { LogIn, Shield, Sparkles, UserCheck } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Email no válido'),
@@ -32,13 +32,13 @@ export default function Login() {
   const handleFillAdmin = () => {
     setValue('email', 'admin@aureahotel.com', { shouldValidate: true });
     setValue('password', 'Admin123!_Secure', { shouldValidate: true });
-    toast.success('Credenciales de Administrador cargadas');
+    toast.success('👑 Credenciales de Admin cargadas');
   };
 
   const handleFillCustomer = () => {
-    setValue('email', 'jmfiguera90@gmail.com', { shouldValidate: true });
-    setValue('password', 'Password123!', { shouldValidate: true });
-    toast.success('Credenciales de Huésped cargadas');
+    setValue('email', 'huesped@aureahotel.com', { shouldValidate: true });
+    setValue('password', 'Guest123!_Secure', { shouldValidate: true });
+    toast.success('👤 Credenciales de Huésped cargadas');
   };
 
   const onSubmit = async (data) => {
@@ -85,14 +85,14 @@ export default function Login() {
         {/* Demo Credentials Box */}
         <div
           style={{
-            background: 'linear-gradient(135deg, rgba(184, 155, 94, 0.08), rgba(240, 237, 230, 0.6))',
-            border: '1px solid rgba(184, 155, 94, 0.35)',
+            background: 'linear-gradient(135deg, rgba(184, 155, 94, 0.08), rgba(240, 237, 230, 0.5))',
+            border: '1px solid rgba(184, 155, 94, 0.3)',
             borderRadius: 'var(--radius-lg)',
-            padding: '0.875rem 1rem',
-            marginBottom: '1.25rem',
+            padding: '1rem',
+            marginBottom: '1.5rem',
           }}
         >
-          <div className="flex items-center justify-between" style={{ marginBottom: '0.5rem' }}>
+          <div className="flex items-center justify-between" style={{ marginBottom: '0.625rem' }}>
             <span
               className="flex items-center gap-xs"
               style={{
@@ -103,66 +103,78 @@ export default function Login() {
                 textTransform: 'uppercase',
               }}
             >
-              <Shield size={14} /> Credenciales de Prueba
+              <Shield size={14} /> Acceso Rápido Demo
             </span>
             <span
               style={{
                 fontSize: '10px',
                 background: 'var(--gold)',
                 color: '#fff',
-                padding: '1px 6px',
+                padding: '2px 8px',
                 borderRadius: '4px',
                 fontWeight: 600,
+                letterSpacing: '0.05em',
               }}
             >
-              DEMO
+              1-CLIC
             </span>
           </div>
 
           <div
             style={{
-              fontSize: 'var(--text-xs)',
+              fontSize: '12px',
               color: 'var(--muted-dark)',
-              lineHeight: 1.5,
-              marginBottom: '0.75rem',
+              lineHeight: 1.6,
+              marginBottom: '0.875rem',
+              background: '#ffffff',
+              padding: '0.5rem 0.75rem',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--warm-gray)',
             }}
           >
-            <div>
-              <strong>👑 Admin:</strong> <code style={{ color: 'var(--obsidian)', fontWeight: 600 }}>admin@aureahotel.com</code>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+              <span><strong>👑 Admin:</strong> admin@aureahotel.com</span>
+              <code style={{ fontSize: '11px', color: 'var(--muted)' }}>Admin123!_Secure</code>
             </div>
-            <div>
-              <strong>🔑 Clave:</strong> <code style={{ color: 'var(--obsidian)', fontWeight: 600 }}>Admin123!_Secure</code>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span><strong>👤 Huésped:</strong> huesped@aureahotel.com</span>
+              <code style={{ fontSize: '11px', color: 'var(--muted)' }}>Guest123!_Secure</code>
             </div>
           </div>
 
-          <div className="flex gap-xs flex-wrap">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
             <button
               type="button"
               onClick={handleFillAdmin}
               className="btn btn-primary btn-sm"
               style={{
-                fontSize: '11px',
-                padding: '0.25rem 0.625rem',
+                fontSize: '12px',
+                textTransform: 'none',
+                padding: '0.4rem 0.5rem',
                 borderRadius: '6px',
-                flex: 1,
-                minHeight: '32px',
+                minHeight: '36px',
+                whiteSpace: 'normal',
+                lineHeight: 1.2,
               }}
             >
-              <Sparkles size={13} /> Autocompletar Admin
+              <Sparkles size={14} style={{ flexShrink: 0 }} /> Admin
             </button>
             <button
               type="button"
               onClick={handleFillCustomer}
               className="btn btn-secondary btn-sm"
               style={{
-                fontSize: '11px',
-                padding: '0.25rem 0.625rem',
+                fontSize: '12px',
+                textTransform: 'none',
+                padding: '0.4rem 0.5rem',
                 borderRadius: '6px',
-                flex: 1,
-                minHeight: '32px',
+                minHeight: '36px',
+                whiteSpace: 'normal',
+                lineHeight: 1.2,
+                borderColor: 'var(--warm-gray-dark)',
               }}
             >
-              <UserCheck size={13} /> Autocompletar Huésped
+              <UserCheck size={14} style={{ flexShrink: 0 }} /> Huésped
             </button>
           </div>
         </div>
