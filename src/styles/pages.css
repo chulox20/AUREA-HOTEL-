@@ -1031,3 +1031,225 @@
     grid-row: span 1;
   }
 }
+
+/* ══════════════════════════════════════════
+   ADMIN — GANTT CALENDAR
+   ══════════════════════════════════════════ */
+.calendar-gantt-card {
+  background: #ffffff;
+  border: 1px solid var(--warm-gray);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+}
+
+.calendar-header-toolbar {
+  padding: 1.25rem 1.5rem;
+  background: var(--ivory);
+  border-bottom: 1px solid var(--warm-gray);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.calendar-month-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--obsidian);
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.calendar-gantt-scroll {
+  overflow-x: auto;
+  position: relative;
+  max-width: 100%;
+}
+
+.gantt-table {
+  display: flex;
+  flex-direction: column;
+  min-width: 1200px;
+}
+
+.gantt-header-row {
+  display: flex;
+  background: var(--ivory-dark);
+  border-bottom: 2px solid var(--warm-gray);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.gantt-room-header-col {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  padding: 0.875rem 1rem;
+  font-weight: 700;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-dark);
+  border-right: 1px solid var(--warm-gray);
+  background: var(--ivory-dark);
+  position: sticky;
+  left: 0;
+  z-index: 15;
+}
+
+.gantt-days-header-wrapper {
+  display: flex;
+  flex: 1;
+}
+
+.gantt-day-header-cell {
+  flex: 1;
+  min-width: 44px;
+  padding: 0.5rem 0.25rem;
+  text-align: center;
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.gantt-day-header-cell.is-today {
+  background: rgba(184, 155, 94, 0.12);
+  border-bottom: 2px solid var(--gold);
+}
+
+.gantt-day-header-cell.is-weekend {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.gantt-day-header-cell .day-name {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.gantt-day-header-cell .day-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--obsidian);
+}
+
+.gantt-day-header-cell.is-today .day-num {
+  color: var(--gold);
+}
+
+.gantt-category-row {
+  background: #fdfbf7;
+  padding: 0.5rem 1rem;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--gold-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--warm-gray);
+  position: sticky;
+  left: 0;
+  z-index: 12;
+}
+
+.gantt-room-row {
+  display: flex;
+  border-bottom: 1px solid var(--warm-gray);
+  min-height: 52px;
+  position: relative;
+  transition: background 0.15s;
+}
+
+.gantt-room-row:hover {
+  background: rgba(250, 249, 246, 0.8);
+}
+
+.gantt-room-col {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-right: 1px solid var(--warm-gray);
+  background: #ffffff;
+  position: sticky;
+  left: 0;
+  z-index: 8;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.02);
+}
+
+.gantt-room-row:hover .gantt-room-col {
+  background: #faf9f6;
+}
+
+.gantt-timeline-track {
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+
+.gantt-day-bg-cell {
+  flex: 1;
+  min-width: 44px;
+  border-right: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.gantt-day-bg-cell.is-today {
+  background: rgba(184, 155, 94, 0.05);
+}
+
+.gantt-day-bg-cell.is-weekend {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.gantt-reservation-pill {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  border-radius: 6px;
+  padding: 0 0.5rem;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s, box-shadow 0.15s;
+  z-index: 5;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.gantt-reservation-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.gantt-reservation-pill.confirmed {
+  background: linear-gradient(135deg, #0984e3, #74b9ff);
+}
+
+.gantt-reservation-pill.checked_in {
+  background: linear-gradient(135deg, #00b894, #55efc4);
+  color: #0c4a3e;
+}
+
+.gantt-reservation-pill.checked_out {
+  background: linear-gradient(135deg, #636e72, #b2bec3);
+}
+
+.gantt-reservation-pill.pending {
+  background: linear-gradient(135deg, #e17055, #fab1a0);
+}
+

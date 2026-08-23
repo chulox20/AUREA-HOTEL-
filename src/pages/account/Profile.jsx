@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getInitials } from '../../lib/utils';

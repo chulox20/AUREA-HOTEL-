@@ -181,6 +181,19 @@ export const roomService = {
   },
 
   /**
+   * ADMIN: Delete a physical room
+   */
+  async deleteRoom(roomId) {
+    const { error } = await supabase
+      .from('rooms')
+      .delete()
+      .eq('id', roomId);
+
+    if (error) throw error;
+    return true;
+  },
+
+  /**
    * ADMIN: Fetch all room types for administration
    */
   async getAdminRoomTypes() {

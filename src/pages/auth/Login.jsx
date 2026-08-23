@@ -31,9 +31,13 @@ export default function Login() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      await signIn(data.email, data.password);
+      const result = await signIn(data.email, data.password);
       toast.success('¡Bienvenido de nuevo!');
-      navigate(from, { replace: true });
+      if (result?.profile?.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (err) {
       console.error('Login error:', err);
       toast.error(err.message || 'Error al iniciar sesión. Comprueba tus credenciales.');

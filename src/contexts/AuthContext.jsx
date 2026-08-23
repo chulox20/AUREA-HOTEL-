@@ -93,11 +93,12 @@ export function AuthProvider({ children }) {
       password,
     });
     if (error) throw error;
+    let userProfile = null;
     if (data?.user) {
       setUser(data.user);
-      await fetchProfile(data.user.id);
+      userProfile = await fetchProfile(data.user.id);
     }
-    return data;
+    return { ...data, profile: userProfile };
   };
 
   // Sign in with Google
