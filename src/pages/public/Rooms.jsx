@@ -279,26 +279,31 @@ export default function Rooms() {
                       onClick={() => navigate(`/rooms/${room.slug}`)}
                     >
                       <div className="room-card-image">
-                        <div
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            background: `linear-gradient(135deg, ${
-                              room.slug.includes('standard')
-                                ? '#2c3e50, #3498db'
-                                : room.slug.includes('deluxe')
-                                ? '#2c3e50, #8e44ad'
-                                : room.slug.includes('ocean')
-                                ? '#0f3460, #16213e'
-                                : '#1a1a2e, #b89b5e'
-                            })`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'rgba(255,255,255,0.2)',
-                          }}
-                        >
-                          <BedDouble size={48} />
+                        <img
+                          src={
+                            room.images?.[0]?.url ||
+                            'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=85'
+                          }
+                          alt={room.name}
+                          loading="lazy"
+                        />
+                        <div className="room-card-badge">
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              letterSpacing: '0.08em',
+                              background: 'rgba(23, 23, 23, 0.75)',
+                              color: 'var(--gold-light)',
+                              padding: '3px 8px',
+                              borderRadius: '4px',
+                              backdropFilter: 'blur(6px)',
+                              border: '1px solid rgba(184, 155, 94, 0.3)',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {room.name.split(' ')[0]}
+                          </span>
                         </div>
                       </div>
                       <div className="room-card-body">

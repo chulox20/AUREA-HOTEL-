@@ -25,23 +25,31 @@ import { formatCurrency, getInitials } from '../../lib/utils';
 const EXPERIENCES = [
   {
     id: 'exp-restaurant',
-    name: 'Restaurante',
-    description: 'Cocina mediterránea de autor con vistas panorámicas al océano.',
+    name: 'Restaurante de Autor',
+    category: 'ALTA GASTRONOMÍA',
+    description: 'Cocina mediterránea y fusión marina con los mejores maridajes frente al mar.',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=85',
   },
   {
     id: 'exp-spa',
-    name: 'Spa',
-    description: 'Tratamientos holísticos y circuito termal para una relajación absoluta.',
+    name: 'Spa & Circuito Termal',
+    category: 'BIENESTAR HOLÍSTICO',
+    description: 'Rituales ancestrales, masajes terapéuticos y baños de hidromasaje relajantes.',
+    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=85',
   },
   {
     id: 'exp-pool',
-    name: 'Piscina',
-    description: 'Piscina infinita frente al mar con servicio exclusivo de coctelería.',
+    name: 'Infinity Pool & Lounge',
+    category: 'EXCLUSIVIDAD',
+    description: 'Piscina infinita suspendida sobre el océano con servicio de mixología premium.',
+    image: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1200&q=85',
   },
   {
     id: 'exp-gym',
-    name: 'Gimnasio',
-    description: 'Equipamiento de última generación con vistas a los jardines privados.',
+    name: 'Fitness & Yoga Sanctuary',
+    category: 'SALUD & ENERGÍA',
+    description: 'Equipamiento Technogym de última generación y sesiones de yoga al amanecer.',
+    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=85',
   },
 ];
 
@@ -259,62 +267,64 @@ export default function Home() {
               viewport={{ once: true, margin: '-50px' }}
               variants={stagger}
             >
-              {rooms.map((room) => (
-                <motion.div key={room.id} variants={fadeInUp}>
-                  <div className="room-card" onClick={() => navigate(`/rooms/${room.slug}`)}>
-                    <div className="room-card-image">
-                      <div
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          background: `linear-gradient(135deg, ${
-                            room.slug.includes('standard')
-                              ? '#2c3e50, #3498db'
-                              : room.slug.includes('deluxe')
-                              ? '#2c3e50, #8e44ad'
-                              : room.slug.includes('ocean')
-                              ? '#0f3460, #16213e'
-                              : '#1a1a2e, #b89b5e'
-                          })`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'rgba(255,255,255,0.3)',
-                          fontSize: 'var(--text-3xl)',
-                        }}
-                      >
-                        <BedDouble size={48} />
-                      </div>
-                    </div>
-                    <div className="room-card-body">
-                      <div className="room-card-type">{room.name.split(' ')[0]}</div>
-                      <h3 className="room-card-name">{room.name}</h3>
-                      <div className="room-card-price">
-                        {formatCurrency(room.base_price)} <span>/ noche</span>
-                      </div>
-                      <div className="room-card-meta">
-                        <div className="room-card-meta-item">
-                          <Users size={16} />
-                          {room.capacity} huéspedes
-                        </div>
-                        <div className="room-card-meta-item">
-                          <BedDouble size={16} />
-                          {room.beds}
-                        </div>
-                        <div className="room-card-meta-item">
-                          <Maximize size={16} />
-                          {room.size} m²
+              {rooms.map((room) => {
+                const primaryImage =
+                  room.images?.[0]?.url ||
+                  'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1200&q=85';
+                return (
+                  <motion.div key={room.id} variants={fadeInUp}>
+                    <div className="room-card" onClick={() => navigate(`/rooms/${room.slug}`)}>
+                      <div className="room-card-image">
+                        <img src={primaryImage} alt={room.name} loading="lazy" />
+                        <div className="room-card-badge">
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              letterSpacing: '0.08em',
+                              background: 'rgba(23, 23, 23, 0.75)',
+                              color: 'var(--gold-light)',
+                              padding: '3px 8px',
+                              borderRadius: '4px',
+                              backdropFilter: 'blur(6px)',
+                              border: '1px solid rgba(184, 155, 94, 0.3)',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {room.name.split(' ')[0]}
+                          </span>
                         </div>
                       </div>
+                      <div className="room-card-body">
+                        <div className="room-card-type">{room.name.split(' ')[0]}</div>
+                        <h3 className="room-card-name">{room.name}</h3>
+                        <div className="room-card-price">
+                          {formatCurrency(room.base_price)} <span>/ noche</span>
+                        </div>
+                        <div className="room-card-meta">
+                          <div className="room-card-meta-item">
+                            <Users size={16} />
+                            {room.capacity} huéspedes
+                          </div>
+                          <div className="room-card-meta-item">
+                            <BedDouble size={16} />
+                            {room.beds}
+                          </div>
+                          <div className="room-card-meta-item">
+                            <Maximize size={16} />
+                            {room.size} m²
+                          </div>
+                        </div>
+                      </div>
+                      <div className="room-card-footer">
+                        <button className="btn btn-outline-gold" style={{ width: '100%' }}>
+                          Ver habitación <ArrowRight size={16} />
+                        </button>
+                      </div>
                     </div>
-                    <div className="room-card-footer">
-                      <button className="btn btn-outline-gold" style={{ width: '100%' }}>
-                        Ver habitación <ArrowRight size={16} />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </motion.div>
           )}
         </div>
@@ -330,9 +340,10 @@ export default function Home() {
             viewport={{ once: true, margin: '-100px' }}
             variants={fadeInUp}
           >
-            <div className="text-overline">Experiencias</div>
+            <div className="text-overline">Experiencias & Servicios</div>
             <h2>Vive momentos inolvidables</h2>
             <div className="divider" />
+            <p>Descubre un santuario de alta gastronomía, bienestar termal y espacios diseñados para deleitar tus sentidos.</p>
           </motion.div>
 
           <motion.div
@@ -342,40 +353,23 @@ export default function Home() {
             viewport={{ once: true, margin: '-50px' }}
             variants={stagger}
           >
-            {EXPERIENCES.map((exp) => {
-              const Icon = experienceIcons[exp.name] || Sparkles;
-              return (
-                <motion.div key={exp.id} variants={fadeInUp}>
-                  <div className="experience-card">
-                    <div
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        background: `linear-gradient(135deg, ${
-                          exp.id === 'exp-restaurant'
-                            ? '#2d1b00, #5c3317'
-                            : exp.id === 'exp-spa'
-                            ? '#1a332e, #2d5248'
-                            : exp.id === 'exp-pool'
-                            ? '#003d5c, #0077b6'
-                            : '#1a1a2e, #2d2d44'
-                        })`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'rgba(255,255,255,0.15)',
-                      }}
-                    >
-                      <Icon size={64} />
-                    </div>
-                    <div className="experience-card-overlay">
-                      <h3>{exp.name}</h3>
-                      <p>{exp.description}</p>
-                    </div>
+            {EXPERIENCES.map((exp) => (
+              <motion.div key={exp.id} variants={fadeInUp}>
+                <div className="experience-card" onClick={() => navigate('/rooms')}>
+                  <img
+                    src={exp.image}
+                    alt={exp.name}
+                    className="experience-card-img"
+                    loading="lazy"
+                  />
+                  <div className="experience-card-overlay">
+                    <span className="experience-card-cat">{exp.category}</span>
+                    <h3>{exp.name}</h3>
+                    <p>{exp.description}</p>
                   </div>
-                </motion.div>
-              );
-            })}
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>

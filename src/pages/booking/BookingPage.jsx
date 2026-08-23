@@ -182,14 +182,17 @@ export default function BookingPage() {
                           height: 60,
                           borderRadius: 'var(--radius-md)',
                           overflow: 'hidden',
-                          background: 'linear-gradient(135deg, #2c3e50, #8e44ad)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'rgba(255,255,255,0.3)',
+                          flexShrink: 0,
                         }}
                       >
-                        <BedDouble size={24} />
+                        <img
+                          src={
+                            roomType.images?.[0]?.url ||
+                            'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=600&q=80'
+                          }
+                          alt={roomType.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
                       </div>
                       <div>
                         <div className="text-overline" style={{ marginBottom: '0.125rem' }}>
@@ -506,19 +509,14 @@ export default function BookingPage() {
             {currentStep < 4 && (
               <div className="booking-summary">
                 <div className="booking-summary-image">
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      background: 'linear-gradient(135deg, #2c3e50, #8e44ad)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'rgba(255,255,255,0.3)',
-                    }}
-                  >
-                    <BedDouble size={32} />
-                  </div>
+                  <img
+                    src={
+                      roomType.images?.[0]?.url ||
+                      'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=800&q=85'
+                    }
+                    alt={roomType.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
                 </div>
 
                 <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'var(--text-lg)', marginBottom: 'var(--space-xs)' }}>

@@ -156,20 +156,14 @@ export default function RoomDetail() {
     );
   }
 
-  const galleryImages = [
-    `linear-gradient(135deg, ${
-      room.slug.includes('standard')
-        ? '#2c3e50, #3498db'
-        : room.slug.includes('deluxe')
-        ? '#2c3e50, #8e44ad'
-        : room.slug.includes('ocean')
-        ? '#0f3460, #16213e'
-        : '#1a1a2e, #b89b5e'
-    })`,
-    'linear-gradient(135deg, #2d3436, #636e72)',
-    'linear-gradient(135deg, #0c3547, #1a6b8a)',
-    'linear-gradient(135deg, #2c2c2c, #4a4a4a)',
-  ];
+  const galleryImages =
+    room.images && room.images.length > 0
+      ? room.images.map((img) => img.url)
+      : [
+          'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1600&q=85',
+          'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=85',
+          'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1600&q=85',
+        ];
 
   return (
     <div className="page">
@@ -179,43 +173,42 @@ export default function RoomDetail() {
           <span style={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
             Inicio
           </span>
-          {' / '}
+          <span style={{ margin: '0 0.5rem' }}>/</span>
           <span style={{ cursor: 'pointer' }} onClick={() => navigate('/rooms')}>
             Habitaciones
           </span>
-          {' / '}
-          <span style={{ color: 'var(--obsidian)' }}>{room.name}</span>
+          <span style={{ margin: '0 0.5rem' }}>/</span>
+          <span style={{ color: 'var(--obsidian)', fontWeight: 500 }}>{room.name}</span>
         </div>
 
         <div className="room-detail">
-          {/* ── Left: Gallery + Info ── */}
+          {/* Main content */}
           <div>
             {/* Gallery */}
-            <motion.div className="room-gallery" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
+            <motion.div
+              className="room-gallery"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
               <div className="room-gallery-main">
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    background: galleryImages[selectedImage],
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'rgba(255,255,255,0.2)',
-                    fontSize: '3rem',
-                  }}
-                >
-                  <BedDouble size={80} />
-                </div>
+                <img
+                  src={galleryImages[selectedImage] || galleryImages[0]}
+                  alt={`${room.name} vista principal`}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
               </div>
               <div className="room-gallery-thumbs">
-                {galleryImages.map((bg, i) => (
+                {galleryImages.map((imgUrl, i) => (
                   <div
                     key={i}
                     className={cn('room-gallery-thumb', selectedImage === i && 'active')}
                     onClick={() => setSelectedImage(i)}
                   >
-                    <div style={{ width: '100%', height: '100%', background: bg }} />
+                    <img
+                      src={imgUrl}
+                      alt={`Miniatura ${i + 1}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
                   </div>
                 ))}
               </div>
