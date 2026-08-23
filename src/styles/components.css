@@ -676,3 +676,55 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
 }
+
+/* ══════════════════════════════════════════
+   MOBILE APP TOUCH ENHANCEMENTS
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .btn {
+    min-height: 46px;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+  }
+
+  .btn-lg {
+    min-height: 50px;
+    font-size: 0.875rem;
+    width: 100%;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    min-height: 48px;
+    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+  }
+
+  .form-group {
+    margin-bottom: 0.875rem;
+  }
+
+  .modal-card {
+    width: calc(100% - 2rem) !important;
+    max-width: 100% !important;
+    max-height: 85vh;
+    margin: 1rem auto;
+    padding: 1.5rem 1.25rem !important;
+    border-radius: var(--radius-xl) !important;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .card {
+    border-radius: var(--radius-lg);
+  }
+
+  .table-container {
+    border-radius: var(--radius-lg);
+    -webkit-overflow-scrolling: touch;
+  }
+}
+

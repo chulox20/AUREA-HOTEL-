@@ -144,7 +144,7 @@ export default function AdminDashboard() {
       </motion.div>
 
       {/* ── Recent Reservations & Rooms Status ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--space-xl)' }}>
+      <div className="admin-dashboard-grid">
         {/* Recent Reservations */}
         <div>
           <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-md)' }}>

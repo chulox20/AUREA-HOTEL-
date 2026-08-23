@@ -201,7 +201,7 @@ export default function BookingPage() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+                    <div className="form-grid-2">
                       <div>
                         <div style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', marginBottom: '0.25rem' }}>
                           FECHAS
@@ -256,7 +256,7 @@ export default function BookingPage() {
                       padding: 'var(--space-xl)',
                     }}
                   >
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+                    <div className="form-grid-2">
                       <div className="form-group">
                         <label className="form-label">Nombre *</label>
                         <input
@@ -287,14 +287,7 @@ export default function BookingPage() {
                       {errors.email && <span className="form-error">{errors.email.message}</span>}
                     </div>
 
-                    <div
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: 'var(--space-md)',
-                        marginTop: 'var(--space-md)',
-                      }}
-                    >
+                    <div className="form-grid-2" style={{ marginTop: 'var(--space-md)' }}>
                       <div className="form-group">
                         <label className="form-label">Teléfono *</label>
                         <input

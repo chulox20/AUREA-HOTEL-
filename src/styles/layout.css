@@ -118,20 +118,31 @@
 }
 
 @media (max-width: 768px) {
+  :root {
+    --header-height: 64px;
+  }
+
+  .header-inner {
+    padding: 0 1rem;
+  }
+
   .header-nav {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 300px;
+    width: min(320px, 86vw);
     height: 100vh;
-    background: #fff;
+    height: 100dvh;
+    background: #171717;
+    color: #faf9f6;
     flex-direction: column;
     align-items: flex-start;
-    padding: var(--space-4xl) var(--space-xl);
-    gap: var(--space-lg);
-    box-shadow: var(--shadow-2xl);
-    transition: right var(--duration-slow) var(--ease-out);
+    padding: 2rem 1.5rem;
+    gap: 1.25rem;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
+    transition: right var(--duration-normal) var(--ease-out);
     z-index: var(--z-modal);
+    overflow-y: auto;
   }
 
   .header-nav.open {
@@ -139,16 +150,21 @@
   }
 
   .header-nav a {
-    font-size: var(--text-lg);
-    color: var(--obsidian);
+    font-size: var(--text-base);
+    color: rgba(250, 249, 246, 0.85);
+    width: 100%;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .header-nav a:hover,
+  .header-nav a.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
   }
 
   .menu-toggle {
     display: flex;
-  }
-
-  .header-actions .btn {
-    display: none;
   }
 }
 
@@ -156,7 +172,8 @@
 .menu-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(23, 23, 23, 0.5);
+  background: rgba(23, 23, 23, 0.65);
+  backdrop-filter: blur(4px);
   z-index: var(--z-overlay);
   opacity: 0;
   pointer-events: none;
@@ -174,7 +191,7 @@
 .footer {
   background: var(--obsidian);
   color: var(--ivory);
-  padding: var(--space-4xl) 0 var(--space-xl);
+  padding: var(--space-3xl) 0 var(--space-xl);
 }
 
 .footer-grid {
@@ -182,6 +199,20 @@
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: var(--space-2xl);
   margin-bottom: var(--space-2xl);
+}
+
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+  }
+}
+
+@media (max-width: 540px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
 }
 
 .footer-brand .header-logo {
